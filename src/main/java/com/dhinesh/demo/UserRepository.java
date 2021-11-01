@@ -145,7 +145,7 @@ public class UserRepository {
 			if (rs.next()) {
 				credentials = new Credentials();
 
-				credentials.setUserId(rs.getInt("id"));
+				credentials.setUserId(rs.getString("id"));
 				credentials.setUsername(name);
 				credentials.setPassword(rs.getString("password"));
 			}
@@ -158,7 +158,7 @@ public class UserRepository {
 		return credentials;
 	}
 
-	public void storeToken(int id, String token) {
+	public void storeToken(String id, String token) {
 		
 		if(existsId(id)) {
 			
@@ -168,7 +168,7 @@ public class UserRepository {
 				PreparedStatement st = conn.prepareStatement(sql);
 	
 				st.setString(1, token);
-				st.setInt(2, id);
+				st.setString(2, id);
 	
 				st.executeUpdate();
 	
@@ -184,7 +184,7 @@ public class UserRepository {
 			try {
 				PreparedStatement st = conn.prepareStatement(sql);
 	
-				st.setInt(1, id);
+				st.setString(1, id);
 				st.setString(2, token);
 	
 				st.executeUpdate();
@@ -219,7 +219,7 @@ public class UserRepository {
 		return id;
 	}
 
-	private boolean existsId(int id) {
+	private boolean existsId(String id) {
 		boolean exists = false;
 
 		String sql = "select * from Tokens where user_id=" + "'" + id + "'";

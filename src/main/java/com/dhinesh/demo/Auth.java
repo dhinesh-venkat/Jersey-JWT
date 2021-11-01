@@ -75,8 +75,8 @@ public class Auth {
         // The issued token must be associated to a user
         Credentials credentials = repo.getUserByName(username);
         
-        int userId = credentials.getUserId();
-        String token = createJWT(String.valueOf(userId), "auth", username);
+        String userId = credentials.getUserId();
+        String token = createJWT(userId, "auth", username);
 
         repo.storeToken(userId, token);
 

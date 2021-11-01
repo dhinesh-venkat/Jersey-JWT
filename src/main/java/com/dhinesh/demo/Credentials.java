@@ -1,7 +1,7 @@
 package com.dhinesh.demo;
 
 public class Credentials {
-    private int userId;
+    private String userId;
     private String username;
     private String password;
 
@@ -9,11 +9,11 @@ public class Credentials {
         return username;
     }
 
-    public int getUserId() {
+    public String getUserId() {
         return userId;
     }
 
-    public void setUserId(int userId) {
+    public void setUserId(String userId) {
         this.userId = userId;
     }
 
