@@ -28,7 +28,7 @@ public class GetUser {
 	@GET
 	@Path("/user/{id}")
 	@Produces("application/json")
-	public User getUserById(@PathParam("id") int id) {
+	public User getUserById(@PathParam("id") String id) {
 
 		User user = repo.getUserById(id);
 
@@ -73,7 +73,7 @@ public class GetUser {
 	@Path("/delete/{id}")
 	@Produces("application/json")
 	@Consumes("application/json")
-	public User deleteUser(@PathParam("id") int id) {
+	public User deleteUser(@PathParam("id") String id) {
 
 		User user = repo.getUserById(id);
 

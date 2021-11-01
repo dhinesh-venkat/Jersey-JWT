@@ -3,7 +3,9 @@ package com.dhinesh.demo;
 // https://gist.github.com/bdemers/1e2713df2857bc0f35b81dc2ccd0ae9e
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -24,7 +26,7 @@ public class UserRepository {
 			Class.forName("com.mysql.cj.jdbc.Driver");
 			conn = DriverManager.getConnection(url, username, password);
 		} catch (Exception e) {
-			System.out.println(e.getMessage());
+			e.printStackTrace();
 		}
 	}
 
@@ -39,39 +41,39 @@ public class UserRepository {
 			while (rs.next()) {
 				User user = new User();
 
-				user.setId(rs.getInt("id"));
-				user.setAge(rs.getInt("age"));
+				user.setId(rs.getString("id"));
 				user.setName(rs.getString("name"));
 
 				users.add(user);
 			}
 
 		} catch (Exception e) {
-			System.out.println(e.getMessage());
+			e.printStackTrace();
 		}
 
 		return users;
 	}
 
-	public User getUserById(int id) {
-		String query = "select * from Users where id=" + id;
+	public User getUserById(String id) {
+		String sql = "select * from Users where id=?";
 		User user = null;
 
 		try {
-			Statement st = conn.createStatement();
-			ResultSet rs = st.executeQuery(query);
+			PreparedStatement st = conn.prepareStatement(sql);
+			st.setString(1, id);
+
+			ResultSet rs = st.executeQuery();
 
 			if (rs.next()) {
 				user = new User();
 
-				user.setId(rs.getInt("id"));
-				user.setAge(rs.getInt("age"));
+				user.setId(rs.getString("id"));
 				user.setName(rs.getString("name"));
 
 			}
 
 		} catch (Exception e) {
-			System.out.println(e.getMessage());
+			e.printStackTrace();
 		}
 
 		return user;
@@ -79,52 +81,56 @@ public class UserRepository {
 
 	public User addUser(User user) {
 		String sql = "insert into Users values (?,?,?)";
+		// id, name, password
+
+		String id = generateId();
+		// System.out.println(id);
 
 		try {
 			PreparedStatement st = conn.prepareStatement(sql);
 
-			st.setInt(1, user.getId());
-			st.setInt(2, user.getAge());
-			st.setString(3, user.getName());
+			st.setString(1, id);
+			st.setString(2, user.getName());
+			st.setString(3, user.getPassword());
 
 			st.executeUpdate();
 		} catch (SQLException e) {
-			System.out.println(e.getMessage());
+			// possible that the username already exists
+			e.printStackTrace();
 		}
 
 		return getUserById(user.getId());
 	}
 
 	public User update(User user) {
-		String sql = "update Users set age=?, name=? where id=?";
+		String sql = "update Users set name=? where id=?";
 
 		try {
 			PreparedStatement st = conn.prepareStatement(sql);
 
-			st.setInt(1, user.getAge());
-			st.setString(2, user.getName());
-			st.setInt(3, user.getId());
+			st.setString(1, user.getName());
+			st.setString(2, user.getId());
 
 			st.executeUpdate();
 		} catch (SQLException e) {
-			System.out.println(e.getMessage());
+			e.printStackTrace();
 		}
 
 		return getUserById(user.getId());
 
 	}
 
-	public void delete(int id) {
+	public void delete(String id) {
 		String sql = "delete from Users where id=?";
 
 		try {
 			PreparedStatement st = conn.prepareStatement(sql);
 
-			st.setInt(1, id);
+			st.setString(1, id);
 
 			st.executeUpdate();
 		} catch (SQLException e) {
-			System.out.println(e.getMessage());
+			e.printStackTrace();
 		}
 	}
 
@@ -145,8 +151,8 @@ public class UserRepository {
 			}
 
 		} catch (Exception e) {
-			// e.printStackTrace();
-			System.out.println(e.getMessage());
+
+			e.printStackTrace();
 		} 
 
 		return credentials;
@@ -168,7 +174,6 @@ public class UserRepository {
 	
 			} catch (SQLException e) {
 				e.printStackTrace();
-				System.out.println(e.getMessage());
 			} 
 
 			System.out.println("Token updated!");
@@ -186,7 +191,6 @@ public class UserRepository {
 	
 			} catch (SQLException e) {
 				e.printStackTrace();
-				System.out.println(e.getMessage());
 			} 
 
 			System.out.println("Token added!");
@@ -209,7 +213,7 @@ public class UserRepository {
 			}
 
 		} catch (Exception e) {
-			System.out.println(e.getMessage());
+			e.printStackTrace();
 		} 
 
 		return id;
@@ -228,7 +232,7 @@ public class UserRepository {
 				exists = true;
 			}
 		} catch (Exception e) {
-			System.out.println(e.getMessage());
+			e.printStackTrace();
 		}
 
 		return exists;
@@ -250,5 +254,10 @@ public class UserRepository {
 
 		return claims.getSubject();
     }
+
+	public String generateId() {
+		UUID uuid = UUID.randomUUID();
+		return uuid.toString();
+	}
 
 }
